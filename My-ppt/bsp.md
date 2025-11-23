@@ -1,6 +1,5 @@
 
 # BSP
-
 A BSP (Board Support Package) is a collection of software and configuration files that make the Linux operating system run on a specific hardware platform — 
 in my case, an x86-based board.
 

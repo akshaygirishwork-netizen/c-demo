@@ -111,7 +111,7 @@ static ssize_t value_store(struct kobject *kobj, struct kobj_attribute *attr, co
     return count;
 }
 
-# Define the attribute (read/write)
+## Define the attribute (read/write)
 static struct kobj_attribute value_attribute =
     __ATTR(value, 0664, value_show, value_store);
 
