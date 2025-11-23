@@ -113,8 +113,8 @@ void main(){
 
     printf("\n");
 
-    //findMiddle(head);
-    deleteData(&head,10);
+    // findMiddle(head);
+    // deleteData(&head,10);
 
     printdata(head);
 }

@@ -38,8 +38,43 @@ void printData(sll* head){
 	}
 }
 
+sll *mergeList(sll *l1, sll *l2)
+{
+
+	sll new_list = {0};
+
+	sll *tail = &new_list;
+
+	while (l1 && l2)
+	{
+		if (l1->data > l2->data)
+		{
+			tail->next = l1;
+			l1 = l1->next;
+		}
+		else
+		{
+			tail->next = l2;
+			l2 = l2->next;
+		}
+		tail = tail->next;
+	}
+
+	if (l1)
+	{
+		tail->next = l1;
+	}
+	else
+	{
+		tail->next = l2;
+	}
+	return new_list.next;
+}
+
 void main(){
 	sll* head=0;
+	sll* head1=0;
+
 	createNode(10,&head);
 	createNode(20,&head);
 	createNode(30,&head);
@@ -49,7 +84,16 @@ void main(){
 	createNode(70,&head);
 	createNode(80,&head);
 
-	printData(head);
-	
+	createNode(5,&head1);
+	createNode(15,&head1);
+	createNode(25,&head1);
+	createNode(35,&head1);
+	createNode(45,&head1);
+	createNode(55,&head1);
+	createNode(65,&head1);
+	createNode(75,&head1);
+	createNode(85,&head1);
 
+	printData(mergeList(head,head1));
+	// printData(head);
 }

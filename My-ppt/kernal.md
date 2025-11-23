@@ -138,13 +138,12 @@ kobject_put(my_kobj);  // removes the directory and all attributes
 
 
 
-## /proc entry
-===============
+# /proc entry
 
 
 Let’s go step by step to add a /proc entry to your mychardev module so you can monitor internal stats (like data_size) from user-space.
 
-# Step 1: Include necessary headers
+## Step 1: Include necessary headers
 
 Add at the top of your file (with other includes):
 
@@ -155,7 +154,7 @@ proc_fs.h → functions to create/remove proc entries
 
 seq_file.h → helper for sequential file output (clean way to implement /proc reads)
 
-# step2: Create a show function
+## step2: Create a show function
 
 This function is called when user does cat /proc/<your_file>.
 
@@ -166,7 +165,7 @@ static int my_proc_show(struct seq_file *m, void *v)
     return 0;
 }
 
-# Step 3: Implement open function for proc
+## Step 3: Implement open function for proc
 
 static int my_proc_open(struct inode *inode, struct file *file)
 {
@@ -176,7 +175,7 @@ static int my_proc_open(struct inode *inode, struct file *file)
 
 single_open is a helper function for simple /proc files that only need one read.
 
-# Step 4: Define proc operations
+## Step 4: Define proc operations
 
 static const struct proc_ops my_proc_ops = {
     .proc_open    = my_proc_open,
@@ -185,7 +184,7 @@ static const struct proc_ops my_proc_ops = {
     .proc_release = single_release,
 };
 
-# Step 5: Create the proc entry in init()
+## Step 5: Create the proc entry in init()
 
 Add this in hello_init() after adding cdev:
 
@@ -199,7 +198,7 @@ proc_create("mychardev_info", 0444, NULL, &my_proc_ops);
 NULL → parent directory (/proc)
 
 
-# Step 6: Remove proc entry in exit()
+## Step 6: Remove proc entry in exit()
 
 Add this in hello_exit():
 
@@ -207,7 +206,7 @@ remove_proc_entry("mychardev_info", NULL);
 
 Cleans up the entry when the module is removed.
 
-# Step 7: Test from user-space
+## Step 7: Test from user-space
 cat /proc/mychardev_info
 
 Note:

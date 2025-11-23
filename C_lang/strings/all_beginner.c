@@ -209,47 +209,6 @@ void check_substring(char *m)
     printf("Substring not present\n");
 }
 
-// void reverse_each_word(char *s)
-// {
-
-//     char *p, *q, *temp;
-//     char t;
-//     int i;
-//     p = q = s;
-
-//     for (i = 0; p[i]; i++)
-//     {
-//         if (p[i] == ' ' )
-//         {
-//             q = p + i - 1;
-//             temp = q+2;
-
-//             while (p < q)
-//             {
-//                 t = *p;
-//                 *p = *q;
-//                 *q = t;
-//                 p++;
-//                 q--;
-//             }
-//             q = temp;
-//             p = q;
-//             i=0;
-//         }
-//     }
-
-//     q=p+i-1;
-
-//     while(p<q){
-//         t=*p;
-//         *p=*q;
-//         *q=t;
-//         p++;
-//         q--;
-//     }
-
-//     printf("%s\n",s);
-// }
 
 void reverse_each_word(char *s)
 {
@@ -357,6 +316,5 @@ void main(){
     // check_substring(s);
     // reverse_each_word(s);
     // large_small_sentance(s);
-
 
 }
