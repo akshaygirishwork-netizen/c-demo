@@ -62,7 +62,7 @@ Identifies which specific device instance the driver handles.
 
 Think of it as device ID inside the driver**.
 
-```
+```c
 dev_t dev_number;   // major+minor number will be stored here
 
 static int __init chardev_init(void)
@@ -84,59 +84,68 @@ static int __init chardev_init(void)
 ```
 
 ## sysfs entry
-===============
-
 
 Let’s add a sysfs entry to your mychardev module so you can read and write the value variable from user-space.
 
-## Step 1: Include necessary headers
-
+### Step 1: Include necessary headers
+```c
 #include <linux/kobject.h>
 #include <linux/sysfs.h>
 
-
-## Step 2: Declare kobject and attribute
+```
+### Step 2: Declare kobject and attribute
+```c
 static struct kobject *my_kobj;
-
-# Sysfs show function (read)
+```
+#### Sysfs show function (read)
+```c
 static ssize_t value_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
     return sprintf(buf, "%d\n", value);
 }
+```
 
-# Sysfs store function (write)
+
+#### Sysfs store function (write)
+```c
 static ssize_t value_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
 {
     sscanf(buf, "%d", &value);
     printk(KERN_INFO "mychardev: sysfs value updated to %d\n", value);
     return count;
 }
+```
 
-## Define the attribute (read/write)
+#### Define the attribute (read/write)
+```c
 static struct kobj_attribute value_attribute =
     __ATTR(value, 0664, value_show, value_store);
 
+```
+### step3: Create the sysfs entry in hello_init()
 
-## step3: Create the sysfs entry in hello_init()
-
-# Create /sys/kernel/mychardev directory
+#### Create /sys/kernel/mychardev directory
+```c
 my_kobj = kobject_create_and_add("mychardev", kernel_kobj);
 if (!my_kobj) {
     printk(KERN_ERR "mychardev: failed to create kobject\n");
     return -ENOMEM;
 }
+```
 
-# Create value attribute
+#### Create value attribute
+```c
 if (sysfs_create_file(my_kobj, &value_attribute.attr)) {
     printk(KERN_ERR "mychardev: failed to create sysfs file\n");
     kobject_put(my_kobj);
     return -ENOMEM;
 }
+```
 
-## step4: Remove the sysfs entry in hello_exit()
-
+### step4: Remove the sysfs entry in hello_exit()
+```c
 kobject_put(my_kobj);  // removes the directory and all attributes
-
+```
 
 # Key Differences  /dev/node and /sys/
 =======================================
