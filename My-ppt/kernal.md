@@ -374,10 +374,12 @@ Just like real OS drivers.
 ### Why do drivers need poll()?
 
 Your driver currently supports read/write, but:
-**
+```c
+
 ❌ read() blocks
 ❌ users cannot wait for “data available”
-❌ threads cannot use select() or epoll()**
+❌ threads cannot use select() or epoll()
+```
 
 Real drivers (UART, sensors, touch panels, network stacks, etc.) all implement poll() so user programs can wait for data instead of busy-looping.
 
