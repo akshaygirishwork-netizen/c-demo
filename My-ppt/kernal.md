@@ -520,17 +520,21 @@ Your driver will now support custom operations just like real device drivers.
 
 We use the Linux ioctl number convention:
 
+```c
 **_IO  - for simple commands (no data)
 _IOR - read data to user
 _IOW - write data from user
 _IOWR - both directions**
+```
 
 Let’s define three ioctls:
 
 Command	Meaning
+```c
 **CLEAR_BUFFER	Clear kbuf[]
 GET_SIZE	    Return data_size
 SET_VALUE	    Update global 'value' variable**
+```
 
 Add this at top of your driver:
 ```c
