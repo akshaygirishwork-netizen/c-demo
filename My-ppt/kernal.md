@@ -358,7 +358,7 @@ CONFIG_DEBUG_KMEMLEAK
 
 For advanced debugging.
 
-# poll support
+## poll support
 
 let's add poll() support to your driver.
 This will allow user-space programs to use:
@@ -371,31 +371,32 @@ epoll()
 
 Just like real OS drivers.
 
-## Why do drivers need poll()?
+### Why do drivers need poll()?
 
 Your driver currently supports read/write, but:
-
+**
 ❌ read() blocks
 ❌ users cannot wait for “data available”
-❌ threads cannot use select() or epoll()
+❌ threads cannot use select() or epoll()**
 
 Real drivers (UART, sensors, touch panels, network stacks, etc.) all implement poll() so user programs can wait for data instead of busy-looping.
 
-## What we will add
+### What we will add
 ✔ A wait queue
 ✔ A flag indicating "data available"
 ✔ poll callback inside file_operations
 ✔ Wake up readers when new data is written
 
-## step1: Add these global variables
+### step1: Add these global variables
 
 Add at top:
-
+```c
 static DECLARE_WAIT_QUEUE_HEAD(wq);
 static int data_available = 0;
+```
 
-## step2: Modify my_read()
-
+### step2: Modify my_read()
+```c
 ssize_t my_read(struct file *file, char __user *buf, size_t len, loff_t *off)
 {
     ssize_t ret = 0;
@@ -427,12 +428,12 @@ out:
     mutex_unlock(&my_mutex);
     return ret;
 }
+```
 
-
-## step 3 Modify my_write()
+### step 3 Modify my_write()
 
 After successful write, notify poll/select:
-
+```c
 ssize_t my_write(struct file *file, const char __user *buf, size_t len, loff_t *off)
 {
     ssize_t ret = 0;
@@ -459,13 +460,14 @@ out:
     mutex_unlock(&my_mutex);
     return ret;
 }
+```
 
-## step 4: Add poll() callback
+### step 4: Add poll() callback
 
 This is the core part.
 
 Add this function:
-
+```c
 __poll_t my_poll(struct file *file, poll_table *wait)
 {
     __poll_t mask = 0;
@@ -482,9 +484,9 @@ __poll_t my_poll(struct file *file, poll_table *wait)
 
     return mask;
 }
-
-## step5: Add poll to file_operations
-
+```
+### step5: Add poll to file_operations
+```c
 struct file_operations fops = {
     .owner   = THIS_MODULE,
     .open    = my_open,
@@ -493,12 +495,12 @@ struct file_operations fops = {
     .write   = my_write,
     .poll    = my_poll,     // <---- ADD THIS
 };
+```
 
+## Implement ioctl and test in userspace program
 
-# Implement ioctl and test in userspace program
-
-## Step 1 — Why ioctl?
-
+### Step 1 — Why ioctl?
+**
 ioctl() lets user-space send custom commands to the driver.
 Examples:
 
@@ -510,28 +512,28 @@ Set/get configuration
 
 Reset driver
 
-Trigger hardware actions
+Trigger hardware actions**
 
 Your driver will now support custom operations just like real device drivers.
 
-## Step 2 — Define ioctl Commands
+### Step 2 — Define ioctl Commands
 
 We use the Linux ioctl number convention:
 
-_IO  - for simple commands (no data)
+**_IO  - for simple commands (no data)
 _IOR - read data to user
 _IOW - write data from user
-_IOWR - both directions
+_IOWR - both directions**
 
 Let’s define three ioctls:
 
 Command	Meaning
-CLEAR_BUFFER	Clear kbuf[]
+**CLEAR_BUFFER	Clear kbuf[]
 GET_SIZE	    Return data_size
-SET_VALUE	    Update global 'value' variable
+SET_VALUE	    Update global 'value' variable**
 
 Add this at top of your driver:
-
+```c
 #include <linux/ioctl.h>
 
 #define MY_IOCTL_MAGIC 'A'
@@ -539,12 +541,12 @@ Add this at top of your driver:
 #define IOCTL_CLEAR_BUFFER _IO(MY_IOCTL_MAGIC, 1)
 #define IOCTL_GET_SIZE     _IOR(MY_IOCTL_MAGIC, 2, int)
 #define IOCTL_SET_VALUE    _IOW(MY_IOCTL_MAGIC, 3, int)
+```
 
-
-## Step 3 — Implement ioctl handler
+### Step 3 — Implement ioctl handler
 
 Add this function inside your driver:
-
+```c
 long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
     int temp;
@@ -578,11 +580,11 @@ long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
     return 0;
 }
-
-# Step 4 — Add ioctl to file_operations
+```
+## Step 4 — Add ioctl to file_operations
 
 Modify your struct file_operations:
-
+```c
 struct file_operations fops = {
     .owner   = THIS_MODULE,
     .open    = my_open,
@@ -592,6 +594,8 @@ struct file_operations fops = {
     .poll    = my_poll,
     .unlocked_ioctl = my_ioctl,   // <-- ADD THIS
 };
+```
+
 
 
 
