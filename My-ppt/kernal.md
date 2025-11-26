@@ -157,59 +157,58 @@ Content	        Binary data streams	        Human-readable information
 Created	By      mknod or devtmpfs	        Automatically by kernel
 
 
-# /proc entry
-
+## /proc entry
 
 Let’s go step by step to add a /proc entry to your mychardev module so you can monitor internal stats (like data_size) from user-space.
 
-## Step 1: Include necessary headers
+### Step 1: Include necessary headers
 
 Add at the top of your file (with other includes):
-
+```c
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
-
+```
 proc_fs.h → functions to create/remove proc entries
 
 seq_file.h → helper for sequential file output (clean way to implement /proc reads)
 
-## step2: Create a show function
+### step2: Create a show function
 
 This function is called when user does cat /proc/<your_file>.
-
+```c
 static int my_proc_show(struct seq_file *m, void *v)
 {
     seq_printf(m, "mychardev buffer size = %d\n", data_size);
     seq_printf(m, "mychardev value = %d\n", value);
     return 0;
 }
+```
 
-## Step 3: Implement open function for proc
-
+### Step 3: Implement open function for proc
+```c
 static int my_proc_open(struct inode *inode, struct file *file)
 {
     return single_open(file, my_proc_show, NULL);
 }
-
-
+```
 single_open is a helper function for simple /proc files that only need one read.
 
-## Step 4: Define proc operations
-
+### Step 4: Define proc operations
+```c
 static const struct proc_ops my_proc_ops = {
     .proc_open    = my_proc_open,
     .proc_read    = seq_read,
     .proc_lseek   = seq_lseek,
     .proc_release = single_release,
 };
-
-## Step 5: Create the proc entry in init()
+```
+### Step 5: Create the proc entry in init()
 
 Add this in hello_init() after adding cdev:
-
+```c
 proc_create("mychardev_info", 0444, NULL, &my_proc_ops);
 
-
+```
 "mychardev_info" → filename under /proc
 
 0444 → read-only for everyone
@@ -217,12 +216,12 @@ proc_create("mychardev_info", 0444, NULL, &my_proc_ops);
 NULL → parent directory (/proc)
 
 
-## Step 6: Remove proc entry in exit()
+### Step 6: Remove proc entry in exit()
 
 Add this in hello_exit():
-
+```c
 remove_proc_entry("mychardev_info", NULL);
-
+```
 Cleans up the entry when the module is removed.
 
 ## Step 7: Test from user-space
@@ -234,28 +233,28 @@ Note:
 Now your driver has both monitoring and configuration interfaces.
 
 
-# Different Users, Different Needs
+**# Different Users, Different Needs
 User	                Primary Need	            Preferred Interface
 ====                    ============                ====================
 Application Developer	Read/write data	            /dev
 System Administrator	Configure device	        /sys
 Support Engineer	    Debug issues	            /proc + /sys
 Monitoring Tool	        Gather metrics	            /proc
+**
 
+## /dev/mychardev appear automatically, so you no longer need mknod.
 
-# /dev/mychardev appear automatically, so you no longer need mknod.
-
-## step 1: Add global variables
+### step 1: Add global variables
 
 Add these near top:
 
 static struct class *my_class;
 static struct device *my_device;
 
-## Step 2: Add class + device creation in hello_init()
+### Step 2: Add class + device creation in hello_init()
 
 Put this after cdev_add():
-
+```c
 // Create device class
 my_class = class_create("mychardev_class");
 if (IS_ERR(my_class)) {
@@ -276,14 +275,15 @@ if (IS_ERR(my_device)) {
 }
 
 printk(KERN_INFO "/dev/mychardev created successfully\n");
+```
 
-## Step 3: Add cleanup in hello_exit()
+### Step 3: Add cleanup in hello_exit()
 
 Add BEFORE cdev_del():
-
+```c
 device_destroy(my_class, dev_number);
 class_destroy(my_class);
-
+```
 
 # Errors in kernal
 
