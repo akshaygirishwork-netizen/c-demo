@@ -1,3 +1,8 @@
-1. Focus on Career Clarity
+# Respond to call
 
-"I resigned to take some time to think about my career and find a role that fits my long-term goals. I wanted to make a careful decision rather than rush into another job."
+After my last role, I took a short break of around four months.
+During that time, I worked on improving my skills — mainly Yocto, Linux kernel basics, and embedded Linux.
+I’m now available and actively looking for a suitable opportunity.
+
+
+I wanted to be better prepared technically before my next role

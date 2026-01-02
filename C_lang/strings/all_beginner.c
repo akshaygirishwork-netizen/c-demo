@@ -209,40 +209,44 @@ void check_substring(char *m)
     printf("Substring not present\n");
 }
 
-
 void reverse_each_word(char *s)
 {
-
-    char *start, *end;
-    char t;
-    start = end = s;
+    char *start = s;
+    char *end = s;
 
     while (*start)
     {
-        while (*start == ' ')
+        // Skip spaces
+        while (*start == ' ' && *start)
             start++;
 
-        end = start;
+        if (*start == '\0')
+            break;
 
-        while (*end && *end != ' ')
+        // end moves to end of the word
+        end = start;
+        while (*end != ' ' && *end)
             end++;
 
+        // Reverse from start to end-1
         char *left = start;
         char *right = end - 1;
+        char temp;
 
         while (left < right)
         {
-            t = *left;
+            temp = *left;
             *left = *right;
-            *right = t;
-
+            *right = temp;
             left++;
             right--;
         }
 
+        // Move start to next word
         start = end;
     }
-    printf("%s\n",s);
+
+    printf("%s\n", s);
 }
 
 void large_small_sentance(char *s){
@@ -253,28 +257,28 @@ void large_small_sentance(char *s){
     int max_lenth=9999;
     int min_lenth=0;
 
-    char * start,*end;
-    start=end=s;
+    char * left,*right;
+    left=right=s;
 
-    while(*start){
+    while(*left){
 
-        while(*start ==' ')
-            start++;
+        while(*left ==' ')
+            left++;
 
-        end=start;
+        right=left;
         
         count=0;
 
-        while(*end && *end != ' '){
-            end++;
+        while(*right && *right != ' '){
+            right++;
             count++;
         }
        
         if(count > min_lenth){
             min_lenth=count;
             i=0;
-            char*p = start;
-            while(p < end){
+            char*p = left;
+            while(p < right){
                 large[i++]=*p++;
             }
             large[i]='\0';
@@ -283,18 +287,42 @@ void large_small_sentance(char *s){
         if (count < max_lenth){
             max_lenth=count;
             i=0;
-            char*p = start;
+            char*p = left;
 
-            while(p<end){
+            while(p<right){
                 small[i++] = *p++;
             }
             small[i] = '\0';
         }
 
-        start = end;
+        left = right;
     }
     printf("large=%s\nsmallest=%s\n",large,small);
 
+}
+
+void check_pallindom(char*s){
+    char*left,*right;
+    left=right=s;
+
+    while(*right){
+        right++;
+    }
+    right--;
+
+    while(left<right){
+        if(*left != *right){
+            break;
+        }
+        left++;
+        right--;
+    }
+    if(left>=right){
+        printf("Pallindrome\n");
+    }
+    else{
+        printf("Not pallindrome\n");
+    }
 }
 
 void main(){
@@ -316,5 +344,6 @@ void main(){
     // check_substring(s);
     // reverse_each_word(s);
     // large_small_sentance(s);
+    check_pallindom(s);
 
 }

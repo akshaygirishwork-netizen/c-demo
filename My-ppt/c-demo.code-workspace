@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../yocto-kirkstone/meta-custom"
+		},
+		{
+			"path": "../../yocto-kirkstone/poky/build/conf"
+		},
+		{
+			"path": "../../yocto-kirkstone/poky/build/tmp/deploy/images/u-boot-sign"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.conf": "bitbake",
+			"*.inc": "bitbake"
+		}
+	}
+}
