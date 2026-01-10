@@ -134,7 +134,7 @@ void main(){
 	createNode(85,&head1);
 
 
-	deleteNode(&head);
+	// deleteNode(&head);
 
 	// printData(mergeList(head,head1));
 	// printData(head);
