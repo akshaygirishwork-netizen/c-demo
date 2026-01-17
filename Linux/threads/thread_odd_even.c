@@ -2,42 +2,69 @@
 #include <pthread.h>
 #include <unistd.h>
 
-void *thread1(void *p) {
-    int num=1;
-    while(1){
-        printf("%d\n",num);
-        num=num+2;
+pthread_mutex_t lock;
+pthread_cond_t cond;
 
-        if(num>=100){
-            pthread_exit("completed odd\n");
+int num=1;
+
+void *even(void *p) {
+
+    while(1){
+        pthread_mutex_lock(&lock);
+
+        while(num%2 == 1 && num<=100)
+            pthread_cond_wait(&cond,&lock);
+
+        if(num>100){
+            pthread_cond_signal(&cond);
+            pthread_mutex_unlock(&lock);
+            break;
         }
+
+        printf("even:%d\n",num++);
+
+        pthread_cond_signal(&cond);
+        pthread_mutex_unlock(&lock);
     }
+    return NULL;
 }
 
-void *thread2(void *p) {
-    int num=2;
+void *odd(void *p) {
     while(1){
-        printf("%d\n",num);
-        num=num+2;
+        pthread_mutex_lock(&lock);
 
-        if(num>=100){
-            pthread_exit("completed even\n");
+        while(num%2 == 0 && num<=100)
+            pthread_cond_wait(&cond,&lock);
+
+        if(num>100){
+            pthread_cond_signal(&cond);
+            pthread_mutex_unlock(&lock);
+            break;
         }
+
+        printf(" odd:%d\n",num++);
+
+        pthread_cond_signal(&cond);
+        pthread_mutex_unlock(&lock);
     }
+    return NULL;
 }
 
 int main() {
     char *p1, *p2;
     pthread_t t1, t2;
 
-    pthread_create(&t1, NULL, thread1, "hello_t1");
-    pthread_create(&t2, NULL, thread2, NULL);
+    pthread_mutex_init(&lock,NULL);
+    pthread_cond_init(&cond,NULL);
 
-    pthread_join(t1, (void**)&p1);
-    pthread_join(t2, (void**)&p2);
+    pthread_create(&t1, NULL, even, NULL);
+    pthread_create(&t2, NULL, odd, NULL);
 
-    printf("After %s\n", p1);
-    printf("After %s\n", p2);
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+
+    pthread_mutex_destroy(&lock);
+    pthread_cond_destroy(&cond);
 
     return 0;
 }
