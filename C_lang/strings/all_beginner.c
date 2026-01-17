@@ -325,6 +325,29 @@ void check_pallindom(char*s){
     }
 }
 
+void countstrstr(char*m){
+
+    char s[] = "hello";
+    int j;
+    int count =0;
+
+    for(int i=0;m[i];i++){
+        if(m[i] == s[0]){
+            for( j=1;s[j];j++){
+                if(m[i+j] != s[j]){
+                    break;
+                }
+            }
+        if(s[j] == '\0'){
+            count++;
+        }
+        }
+    }
+
+    printf("%d\n",count);
+
+}
+
 void main(){
     char s[100];
     
@@ -344,6 +367,8 @@ void main(){
     // check_substring(s);
     // reverse_each_word(s);
     // large_small_sentance(s);
-    check_pallindom(s);
+    // check_pallindom(s);
+
+    countstrstr(s);
 
 }

@@ -1,5 +1,7 @@
 #include<stdio.h>
 
+void countSetbit(signed );
+
 void printBinary(int num){
 
   for (int pos=31;pos>=0;pos--){
@@ -205,8 +207,23 @@ void main(int argc,char**argv[]){
   // findTrailingZeros();
   // highestSetBit();
   // swapBit(1,2);
-  checkBitpall();
+  // checkBitpall();
 
+  countSetbit(-10);
+  printBinary(-10);
   // replaceBite();
+
+}
+
+void countSetbit(int num){
+
+  char count=0;
+
+  for(int pos=0;pos<=31;pos++){
+    if((num>>pos)&1){
+      count++;
+    }
+  }
+  printf("%d\n",count);
 
 }
