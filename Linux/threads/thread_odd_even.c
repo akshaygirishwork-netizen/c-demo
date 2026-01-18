@@ -3,13 +3,21 @@
 #include <unistd.h>
 #include <syscall.h>
 #include <time.h>
+#include <sched.h>
 
 pthread_mutex_t lock;
 pthread_cond_t cond;
 struct timespec ts;
-pid_t tid;
 
 int num=1;
+
+void set_realtime(int prio){
+    struct sched_param param = {0};
+    param.sched_priority=prio;
+
+    if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &param) != 0)
+        perror("pthread_setschedparam");
+}
 
 int isprime(int num){
 
@@ -24,9 +32,19 @@ int isprime(int num){
     return 1;
 }
 
-void *even(void *p) {
+int isPowOfTo(int num){
 
+    if((num&num-1)==0){
+        return 1;
+    }
+    return 0;
+
+}
+
+void *even(void *p) {
+    set_realtime(40);
     while(1){
+        sleep(1);
         pthread_mutex_lock(&lock);
 
         while(((num%2 == 1) || isprime(num)) && num<=100)
@@ -37,7 +55,6 @@ void *even(void *p) {
             pthread_mutex_unlock(&lock);
             break;
         }
-        tid=syscall(SYS_gettid);
         printf("even:  [%d]\n", num++);
 
         pthread_cond_broadcast(&cond);
@@ -47,7 +64,9 @@ void *even(void *p) {
 }
 
 void *odd(void *p) {
+    set_realtime(60);
     while(1){
+        sleep(1);
         pthread_mutex_lock(&lock);
 
         while(((num%2 == 0) || isprime(num)) && num<=100)
@@ -58,7 +77,6 @@ void *odd(void *p) {
             pthread_mutex_unlock(&lock);
             break;
         }
-        tid=syscall(SYS_gettid);
         printf("odd:   [%d]\n", num++);
 
         pthread_cond_broadcast(&cond);
@@ -68,8 +86,10 @@ void *odd(void *p) {
 }
 
 void* prime(void*p){
+    set_realtime(80);
 
     while(1){
+        sleep(1);
         pthread_mutex_lock(&lock);
 
         while(num <= 100 && !isprime(num))
@@ -90,8 +110,18 @@ void* prime(void*p){
     return NULL; 
 }
 
+void* powerOftwo(void*){
+
+    while(1){
+        sleep(1);
+        pthread_mutex_lock(&lock);
+
+        while(num<=100 && (num%2==1) || num%2 == 0 )
+    }
+
+}
+
 int main() {
-    char *p1, *p2;
     pthread_t t1, t2 ,t3;
 
     pthread_mutex_init(&lock,NULL);
